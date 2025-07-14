@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct FeeDivisionView: View {
     @State private var feeCombinationViewModel = FeeCombinationViewModel()
     @FocusState private var keyboardFocusType: KeyboardFocusType?
     
@@ -93,7 +93,7 @@ struct ContentView: View {
 }
 
 // MARK: - Nested Types
-extension ContentView {
+extension FeeDivisionView {
     enum KeyboardFocusType: Hashable {
         case total, count
     }
@@ -101,6 +101,6 @@ extension ContentView {
 
 #Preview {
     NavigationStack {
-        ContentView()
+        FeeDivisionView()
     }
 }

@@ -34,7 +34,7 @@ final class FeeCombinationViewModel {
 
 // MARK: - Interfaces
 extension FeeCombinationViewModel {
-    func calculate() async {
+    func calculate() {
         task?.cancel()
         
         errorMessage = nil

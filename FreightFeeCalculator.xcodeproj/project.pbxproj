@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		042AF38B2E1E8F57000C5671 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 042AF33B2E1D520D000C5671 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 042AF3422E1D520E000C5671;
+			remoteInfo = FreightFeeCalculator;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		042AF3432E1D520E000C5671 /* FreightFeeCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreightFeeCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		042AF3872E1E8F57000C5671 /* FreightFeeCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreightFeeCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = FreightFeeCalculator;
 			sourceTree = "<group>";
 		};
+		042AF3882E1E8F57000C5671 /* FreightFeeCalculatorTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FreightFeeCalculatorTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		042AF3402E1D520E000C5671 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		042AF3842E1E8F57000C5671 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				042AF3452E1D520E000C5671 /* FreightFeeCalculator */,
+				042AF3882E1E8F57000C5671 /* FreightFeeCalculatorTests */,
 				042AF3442E1D520E000C5671 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				042AF3432E1D520E000C5671 /* FreightFeeCalculator.app */,
+				042AF3872E1E8F57000C5671 /* FreightFeeCalculatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = 042AF3432E1D520E000C5671 /* FreightFeeCalculator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		042AF3862E1E8F57000C5671 /* FreightFeeCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 042AF38D2E1E8F57000C5671 /* Build configuration list for PBXNativeTarget "FreightFeeCalculatorTests" */;
+			buildPhases = (
+				042AF3832E1E8F57000C5671 /* Sources */,
+				042AF3842E1E8F57000C5671 /* Frameworks */,
+				042AF3852E1E8F57000C5671 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				042AF38C2E1E8F57000C5671 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				042AF3882E1E8F57000C5671 /* FreightFeeCalculatorTests */,
+			);
+			name = FreightFeeCalculatorTests;
+			packageProductDependencies = (
+			);
+			productName = FreightFeeCalculatorTests;
+			productReference = 042AF3872E1E8F57000C5671 /* FreightFeeCalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +130,10 @@
 				TargetAttributes = {
 					042AF3422E1D520E000C5671 = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					042AF3862E1E8F57000C5671 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 042AF3422E1D520E000C5671;
 					};
 				};
 			};
@@ -100,12 +152,20 @@
 			projectRoot = "";
 			targets = (
 				042AF3422E1D520E000C5671 /* FreightFeeCalculator */,
+				042AF3862E1E8F57000C5671 /* FreightFeeCalculatorTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		042AF3412E1D520E000C5671 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		042AF3852E1E8F57000C5671 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +182,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		042AF3832E1E8F57000C5671 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		042AF38C2E1E8F57000C5671 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 042AF3422E1D520E000C5671 /* FreightFeeCalculator */;
+			targetProxy = 042AF38B2E1E8F57000C5671 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		042AF34C2E1D520F000C5671 /* Debug */ = {
@@ -302,6 +377,42 @@
 			};
 			name = Release;
 		};
+		042AF38E2E1E8F57000C5671 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P85DW78LYM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SwainYun.FreightFeeCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FreightFeeCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FreightFeeCalculator";
+			};
+			name = Debug;
+		};
+		042AF38F2E1E8F57000C5671 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P85DW78LYM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SwainYun.FreightFeeCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FreightFeeCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FreightFeeCalculator";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -319,6 +430,15 @@
 			buildConfigurations = (
 				042AF34F2E1D520F000C5671 /* Debug */,
 				042AF3502E1D520F000C5671 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		042AF38D2E1E8F57000C5671 /* Build configuration list for PBXNativeTarget "FreightFeeCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				042AF38E2E1E8F57000C5671 /* Debug */,
+				042AF38F2E1E8F57000C5671 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

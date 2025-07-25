@@ -6,13 +6,24 @@
 //
 
 import SwiftUI
+import Swinject
 
 @main
 struct FreightFeeCalculatorApp: App {
+    private let resolver: Resolver = {
+        let assembler = Assembler([
+            InfrastructureAssembly(),
+            RepositoryAssembly(),
+            DomainAssembly(),
+            PresentationAssembly()
+        ])
+        return assembler.resolver
+    }()
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView()
+                ContentView(resolver: resolver)
             }
         }
     }

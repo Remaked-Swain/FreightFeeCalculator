@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
 
 struct FeeDivisionView: View {
-    @State private var feeCombinationViewModel = FeeCombinationViewModel()
+    @State private var feeCombinationViewModel: FeeCombinationViewModel
     @FocusState private var keyboardFocusType: KeyboardFocusType?
+    
+    init(_ resolver: Resolver) {
+        self.feeCombinationViewModel = resolver.resolve(FeeCombinationViewModel.self)!
+    }
     
     var body: some View {
         @Bindable var feeCombinationViewModel = feeCombinationViewModel
@@ -96,11 +101,5 @@ struct FeeDivisionView: View {
 extension FeeDivisionView {
     enum KeyboardFocusType: Hashable {
         case total, count
-    }
-}
-
-#Preview {
-    NavigationStack {
-        FeeDivisionView()
     }
 }

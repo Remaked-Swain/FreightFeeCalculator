@@ -18,7 +18,7 @@ final class FeeCombinationViewModel {
     
     private let calculateFreightFeeUseCase: CalculateFreightFeeUseCaseProtocol
     
-    init(_ calculateFreightFeeUseCase: CalculateFreightFeeUseCaseProtocol = CalculateFreightFeeUseCase()) {
+    init(_ calculateFreightFeeUseCase: CalculateFreightFeeUseCaseProtocol) {
         self.calculateFreightFeeUseCase = calculateFreightFeeUseCase
     }
     

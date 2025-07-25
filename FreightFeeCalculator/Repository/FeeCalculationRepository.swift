@@ -17,8 +17,8 @@ final class FeeCalculationRepository {
     private let storage: CalculationResultStorageProtocol
     
     init(
-        feeCalculator: FeeCalculatorProtocol = FeeCalculator(),
-        storage: CalculationResultStorageProtocol = CalculationResultStorage()
+        feeCalculator: FeeCalculatorProtocol,
+        storage: CalculationResultStorageProtocol
     ) {
         self.feeCalculator = feeCalculator
         self.storage = storage

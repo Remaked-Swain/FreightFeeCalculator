@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		040159492E2B39CF00593D0B /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 040159482E2B39CF00593D0B /* Swinject */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		042AF38B2E1E8F57000C5671 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -39,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				040159492E2B39CF00593D0B /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +95,7 @@
 			);
 			name = FreightFeeCalculator;
 			packageProductDependencies = (
+				040159482E2B39CF00593D0B /* Swinject */,
 			);
 			productName = FreightFeeCalculator;
 			productReference = 042AF3432E1D520E000C5671 /* FreightFeeCalculator.app */;
@@ -146,6 +152,9 @@
 			);
 			mainGroup = 042AF33A2E1D520D000C5671;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 042AF3442E1D520E000C5671 /* Products */;
 			projectDirPath = "";
@@ -444,6 +453,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		040159482E2B39CF00593D0B /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 042AF33B2E1D520D000C5671 /* Project object */;
 }

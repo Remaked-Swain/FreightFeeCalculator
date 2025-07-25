@@ -14,7 +14,7 @@ protocol CalculateFreightFeeUseCaseProtocol {
 final class CalculateFreightFeeUseCase {
     private let repository: FeeCalculationRepositoryProtocol
     
-    init(repository: FeeCalculationRepositoryProtocol = FeeCalculationRepository()) {
+    init(repository: FeeCalculationRepositoryProtocol) {
         self.repository = repository
     }
 }

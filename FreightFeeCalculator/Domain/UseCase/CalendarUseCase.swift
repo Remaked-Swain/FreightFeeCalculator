@@ -81,7 +81,7 @@ final class CalendarUseCase {
                     
                     let numberOfDay = calendar.component(.day, from: currentDate)
                     let isValid = calendar.isDate(currentDate, equalTo: startDateOfMonth, toGranularity: .month)
-                    let day = Day(currentDate, numberOfDay, isValid: isValid)
+                    let day = Day(UUID().uuidString, currentDate, numberOfDay, isValid: isValid)
                     return await (day.date.dayKey(), day)
                 }
             }

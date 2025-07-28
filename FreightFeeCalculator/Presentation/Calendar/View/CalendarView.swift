@@ -137,11 +137,13 @@ extension CalendarView {
             } label: {
                 VStack(spacing: 4) {
                     Text("\(day.day)")
+                        .frame(maxWidth: .infinity)
                     
                     Circle()
                         .fill(backgroundStyle(day.workHours))
                         .frame(width: 10, height: 10)
                 }
+                .padding(.bottom, 8)
                 .foregroundStyle(foregroundStyle(day.isValid))
             }
             .padding(.vertical, 10)
@@ -149,7 +151,7 @@ extension CalendarView {
         }
         
         private func foregroundStyle(_ isValid: Bool) -> Color {
-            isValid ? .accentColor : .gray
+            isValid ? .accentColor : .secondary
         }
         
         private func backgroundStyle(_ workHours: WorkHours?) -> Color {

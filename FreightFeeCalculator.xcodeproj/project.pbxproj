@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		040159492E2B39CF00593D0B /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 040159482E2B39CF00593D0B /* Swinject */; };
+		5915C2A02EABC99500CDF9E1 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 5915C29F2EABC99500CDF9E1 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				040159492E2B39CF00593D0B /* Swinject in Frameworks */,
+				5915C2A02EABC99500CDF9E1 /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,7 +95,7 @@
 			);
 			name = FreightFeeCalculator;
 			packageProductDependencies = (
-				040159482E2B39CF00593D0B /* Swinject */,
+				5915C29F2EABC99500CDF9E1 /* ComposableArchitecture */,
 			);
 			productName = FreightFeeCalculator;
 			productReference = 042AF3432E1D520E000C5671 /* FreightFeeCalculator.app */;
@@ -132,7 +132,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					042AF3422E1D520E000C5671 = {
 						CreatedOnToolsVersion = 16.4;
@@ -153,7 +153,7 @@
 			mainGroup = 042AF33A2E1D520D000C5671;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */,
+				5915C29E2EABC99500CDF9E1 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 042AF3442E1D520E000C5671 /* Products */;
@@ -268,6 +268,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -325,6 +326,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -345,6 +347,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -373,6 +376,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -455,21 +459,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */ = {
+		5915C29E2EABC99500CDF9E1 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.1;
+				minimumVersion = 1.23.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		040159482E2B39CF00593D0B /* Swinject */ = {
+		5915C29F2EABC99500CDF9E1 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 040159472E2B39CF00593D0B /* XCRemoteSwiftPackageReference "Swinject" */;
-			productName = Swinject;
+			package = 5915C29E2EABC99500CDF9E1 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

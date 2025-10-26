@@ -24,7 +24,14 @@ struct Month: Identifiable {
         self._days = days
     }
     
-    func day(for date: Date) async -> Day? {
-        await _days[date.dayKey()]
+    func day(forKey dayKey: String) -> Day? {
+        _days[dayKey]
+    }
+}
+
+// MARK: - Equatable
+extension Month: Equatable {
+    static func == (lhs: Month, rhs: Month) -> Bool {
+        lhs.id == rhs.id
     }
 }

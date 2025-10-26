@@ -6,25 +6,15 @@
 //
 
 import SwiftUI
-import Swinject
+import ComposableArchitecture
 
 @main
 struct FreightFeeCalculatorApp: App {
-    private let resolver: Resolver = {
-        let assembler = Assembler([
-            InfrastructureAssembly(),
-            RepositoryAssembly(),
-            DomainAssembly(),
-            PresentationAssembly()
-        ])
-        return assembler.resolver
-    }()
+    let store: StoreOf<AppFeature> = .init(initialState: AppFeature.State()) { AppFeature() }
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                ContentView(resolver: resolver)
-            }
+            AppView(store: store)
         }
     }
 }

@@ -20,27 +20,40 @@ struct FeeDivisionView: View {
     
     var body: some View {
         VStack {
-            Spacer()
-            
-            ForEach(store.formattedResult) { fee in
-                Text("\(fee.key.formatted(.currency(code: "KRW"))) x \(fee.value)")
-                    .font(.title.bold())
-                    .monospaced()
+            ZStack {
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(store.formattedCombinations) { combination in
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(combination.formattedFees) { fee in
+                                    Text("\(fee.key.formatted(.currency(code: "KRW"))) x \(fee.value)")
+                                        .font(.title3.bold())
+                                        .monospaced()
+                                }
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.ultraThinMaterial)
+                            )
+                        }
+                    }
+                }
+                .scrollIndicators(.never)
+                
+                if let errorMessage = store.errorMessage {
+                    Text(errorMessage)
+                        .font(.headline)
+                        .foregroundStyle(.red)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(.ultraThinMaterial)
+                                .shadow(radius: 10)
+                        )
+                }
             }
-            
-            if let errorMessage = store.errorMessage {
-                Text(errorMessage)
-                    .font(.headline)
-                    .foregroundStyle(.red)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(.ultraThinMaterial)
-                            .shadow(radius: 10)
-                    )
-            }
-            
-            Spacer()
             
             VStack {
                 HStack {

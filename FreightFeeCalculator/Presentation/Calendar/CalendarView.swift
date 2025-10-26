@@ -2,31 +2,36 @@
 //  CalendarView.swift
 //  FreightFeeCalculator
 //
-//  Created by Swain Yun on 7/19/25.
+//  Created by SwainYun on 10/26/25.
 //
 
 import SwiftUI
-import Swinject
+import ComposableArchitecture
+
+private typealias KeyboardFocus = CalendarFeature.KeyboardFocus
 
 struct CalendarView: View {
-    @State private var viewModel: CalendarViewModel
-    @FocusState private var isFocused: Bool
-    
-    init(_ resolver: Resolver) {
-        self.viewModel = resolver.resolve(CalendarViewModel.self)!
-    }
+    @Bindable var store: StoreOf<CalendarFeature>
+    @FocusState private var keyboardFocus: KeyboardFocus?
     
     var body: some View {
-        VStack(spacing: 0) {
-            CalendarHeader(viewModel: viewModel)
+        VStack(spacing: .zero) {
+            CalendarHeader(store: store)
             
-            TabView(selection: $viewModel.calendarIndex) {
-                ForEach(viewModel.months.indices, id: \.self) { index in
-                    CalendarGrid(viewModel: viewModel, month: viewModel.months[index])
+            TabView(selection: $store.calendarIndex) {
+                ForEach(store.months.indices, id: \.self) { index in
+                    CalendarGrid(store: store, month: store.months[index])
                         .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            .overlay {
+                if store.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.black.opacity(0.1))
+                }
+            }
             
             Spacer()
             
@@ -35,9 +40,9 @@ struct CalendarView: View {
                     Text("Rate")
                         .font(.headline)
                     
-                    TextField("Rate", text: $viewModel.rate)
+                    TextField("Rate", text: $store.rate)
                         .keyboardType(.numberPad)
-                        .focused($isFocused)
+                        .focused($keyboardFocus, equals: .rate)
                         .submitLabel(.return)
                         .padding()
                         .background(
@@ -46,7 +51,7 @@ struct CalendarView: View {
                         )
                 }
                 
-                Picker("\(viewModel.selectedWorkHours.value)시간", selection: $viewModel.selectedWorkHours) {
+                Picker("\(store.selectedWorkHours.value)시간", selection: $store.selectedWorkHours) {
                     ForEach(WorkHours.allCases) { workHour in
                         Text("\(workHour.value)시간")
                             .tag(workHour)
@@ -56,8 +61,8 @@ struct CalendarView: View {
             .padding()
             
             Button {
-                viewModel.calculatePay()
-                isFocused = false
+                store.send(.view(.calculateButtonTapped))
+                store.send(.view(.dismissKeyboard))
             } label: {
                 Text("Calculate")
                     .frame(maxWidth: .infinity)
@@ -67,30 +72,35 @@ struct CalendarView: View {
             .safeAreaPadding(.bottom)
             .padding()
         }
-        .onAppear {
-            viewModel.loadCalendarDataSource(for: .now)
-        }
+        .onAppear { store.send(.view(.onAppear)) }
+        .bind($store.keyboardFocus, to: $keyboardFocus)
     }
 }
 
 // MARK: - Subviews
 extension CalendarView {
     struct CalendarHeader: View {
-        let viewModel: CalendarViewModel
+        let store: StoreOf<CalendarFeature>
         
         var body: some View {
             VStack(spacing: 12) {
                 HStack(alignment: .bottom, spacing: 12) {
-                    AsyncDateView(date: viewModel.selectedMonth?.startDate, format: .yyyyMMKorean, prompt: "로딩 중...")
+                    Text(store.selectedMonthTitle)
                         .font(.title)
+                        .id(store.selectedMonthTitle)
+                        .transition(.opacity.combined(with: .move(edge: .leading)))
                     
                     Spacer()
                     
-                    Text("\(viewModel.errorMessage ?? viewModel.totalPay.formatted(.currency(code: "KRW")))")
+                    Text(store.errorMessage ?? store.totalPay.formatted(.currency(code: "KRW")))
                         .font(.headline)
                         .monospacedDigit()
+                        .foregroundStyle(store.errorMessage != nil ? .red : .primary)
                 }
                 .padding([.top, .horizontal])
+                .animation(.default, value: store.selectedMonthTitle)
+                .animation(.default, value: store.errorMessage)
+                .animation(.default, value: store.totalPay)
                 
                 Divider()
                 
@@ -106,7 +116,7 @@ extension CalendarView {
     }
     
     struct CalendarGrid: View {
-        let viewModel: CalendarViewModel
+        let store: StoreOf<CalendarFeature>
         let month: Month
         
         private let columns: [GridItem] = .init(repeating: .init(), count: DayOfWeek.count)
@@ -115,7 +125,7 @@ extension CalendarView {
             VStack {
                 LazyVGrid(columns: columns, spacing: .zero) {
                     ForEach(month.days) { day in
-                        CalendarCell(viewModel: viewModel, day: day)
+                        CalendarCell(store: store, day: day)
                     }
                 }
             }
@@ -123,17 +133,12 @@ extension CalendarView {
     }
     
     struct CalendarCell: View {
-        let viewModel: CalendarViewModel
+        let store: StoreOf<CalendarFeature>
         let day: Day
-        
-        init(viewModel: CalendarViewModel, day: Day) {
-            self.viewModel = viewModel
-            self.day = day
-        }
         
         var body: some View {
             Button {
-                viewModel.onTapDayCell(day)
+                store.send(.view(.dayTapped(day)))
             } label: {
                 VStack(spacing: 4) {
                     Text("\(day.day)")
@@ -148,10 +153,16 @@ extension CalendarView {
             }
             .padding(.vertical, 10)
             .disabled(day.isValid == false)
+            .background {
+                if Calendar.current.isDateInToday(day.date) && day.isValid {
+                    Circle().fill(.secondary.opacity(0.3))
+                        .frame(width: 30, height: 30)
+                }
+            }
         }
         
         private func foregroundStyle(_ isValid: Bool) -> Color {
-            isValid ? .accentColor : .secondary
+            isValid ? .primary : .secondary
         }
         
         private func backgroundStyle(_ workHours: WorkHours?) -> Color {
@@ -162,8 +173,4 @@ extension CalendarView {
             }
         }
     }
-}
-
-#Preview {
-    CalendarView(PreviewHelper.shared.resolver)
 }

@@ -29,3 +29,10 @@ struct Day: Identifiable {
         self.workHours = workHours
     }
 }
+
+// MARK: - Equatable
+extension Day: Equatable {
+    static func == (lhs: Day, rhs: Day) -> Bool {
+        lhs.id == rhs.id && lhs.date == rhs.date && lhs.workHours == rhs.workHours
+    }
+}

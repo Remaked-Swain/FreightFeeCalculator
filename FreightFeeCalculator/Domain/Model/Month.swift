@@ -32,6 +32,6 @@ struct Month: Identifiable {
 // MARK: - Equatable
 extension Month: Equatable {
     static func == (lhs: Month, rhs: Month) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs._days == rhs._days
     }
 }

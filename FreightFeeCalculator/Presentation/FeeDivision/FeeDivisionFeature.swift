@@ -19,6 +19,11 @@ extension FeeDivisionFeature {
         let key: UInt
         let value: Int
     }
+    
+    struct IdentifiableCombination: Identifiable, Equatable {
+        let id: UUID
+        let formattedFees: [FormattedFee]
+    }
 }
 
 @Reducer
@@ -33,18 +38,20 @@ struct FeeDivisionFeature {
         var total: String = ""
         var count: String = ""
         var mode: DividingMode = .byThousand
-        var calculationResult: FeeCombination?
+        var calculationResult: [FeeCombination] = []
         var keyboardFocus: KeyboardFocus?
         
         var isCalculateButtonDisabled: Bool { UInt(total) == nil || Int(count) == nil }
-        var formattedResult: [FormattedFee] {
-            guard let fees = calculationResult?.fees else { return [] }
-            let sorted = fees.sorted {
-                guard $0.value != $1.value else { return $0.key < $1.key }
-                return $0.value > $1.value
+        var formattedCombinations: [IdentifiableCombination] {
+            calculationResult.map { combination in
+                let sortedFees = combination.fees.sorted {
+                    guard $0.value != $1.value else { return $0.key < $1.key }
+                    return $0.value > $1.value
+                }
+                
+                let formatted = sortedFees.map { FormattedFee(key: $0.key, value: $0.value) }
+                return IdentifiableCombination(id: combination.id, formattedFees: formatted)
             }
-            
-            return sorted.map { FormattedFee(key: $0.key, value: $0.value) }
         }
     }
     
@@ -56,7 +63,7 @@ struct FeeDivisionFeature {
         }
         
         enum InnerAction {
-            case calculationResponse(Result<FeeCombination, Error>)
+            case calculationResponse(Result<[FeeCombination], Error>)
         }
         
         case view(ViewAction)
@@ -72,7 +79,7 @@ struct FeeDivisionFeature {
         Reduce { state, action in
             switch action {
             case .view(.calculateButtonTapped):
-                state.calculationResult = nil
+                state.calculationResult = []
                 state.errorMessage = nil
                 
                 
@@ -93,8 +100,8 @@ struct FeeDivisionFeature {
                 state.keyboardFocus = nil
                 return .none
                 
-            case .inner(.calculationResponse(.success(let combination))):
-                state.calculationResult = combination
+            case .inner(.calculationResponse(.success(let combinations))):
+                state.calculationResult = combinations
                 state.errorMessage = nil
                 return .none
                 
@@ -103,8 +110,6 @@ struct FeeDivisionFeature {
                 return .none
                 
             case .binding(\.total), .binding(\.count):
-                state.calculationResult = nil
-                state.errorMessage = nil
                 return .cancel(id: CancelID.calculate)
                 
             case .binding:

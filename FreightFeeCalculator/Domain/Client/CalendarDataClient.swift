@@ -60,7 +60,7 @@ private final actor LiveCalendarDataSource {
         }
         
         daysDict[await dayKey] = day
-        let updatedMonth = Month(existingMonth.id, daysDict, existingMonth.startDate)
+        let updatedMonth = Month(existingMonth.id, daysDict, existingMonth.startDate, existingMonth.savedPay, existingMonth.savedRate)
         monthsCache[await monthKey] = updatedMonth
     }
 }

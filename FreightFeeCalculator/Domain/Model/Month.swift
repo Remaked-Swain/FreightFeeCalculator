@@ -11,17 +11,23 @@ struct Month: Identifiable {
     let id: UUID
     let startDate: Date
     var days: [Day] { _days.values.sorted { $0.date < $1.date } }
+    var savedPay: Double?
+    var savedRate: Double?
     
     private var _days: [String: Day]
     
     init(
         _ id: UUID,
         _ days: [String: Day],
-        _ startDate: Date
+        _ startDate: Date,
+        _ savedPay: Double? = nil,
+        _ savedRate: Double? = nil
     ) {
         self.id = id
         self.startDate = startDate
         self._days = days
+        self.savedPay = savedPay
+        self.savedRate = savedRate
     }
     
     func day(forKey dayKey: String) -> Day? {
@@ -32,6 +38,6 @@ struct Month: Identifiable {
 // MARK: - Equatable
 extension Month: Equatable {
     static func == (lhs: Month, rhs: Month) -> Bool {
-        lhs.id == rhs.id && lhs._days == rhs._days
+        lhs.id == rhs.id && lhs._days == rhs._days && lhs.savedPay == rhs.savedPay && lhs.savedRate == rhs.savedRate
     }
 }

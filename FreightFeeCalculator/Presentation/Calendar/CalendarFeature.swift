@@ -24,6 +24,7 @@ struct CalendarFeature {
         case calendarLoad
         case dayUpdate
         case salaryCalculate
+        case monthSave
     }
     
     @ObservableState
@@ -59,6 +60,7 @@ struct CalendarFeature {
             case dayUpdateResponse(Result<Month, Error>)
             case salaryCalculateResponse(Result<Double, Error>)
             case _setHeaderTitle(String)
+            case _monthSaveResponse(Result<Void, Error>)
         }
         
         case view(ViewAction)
@@ -97,8 +99,6 @@ struct CalendarFeature {
                     return .none
                 }
                 
-                state.isLoading = true
-                state.errorMessage = nil
                 let newWorkHours: WorkHours? = day.hasWorked
                 ? (day.workHours == state.selectedWorkHours ? nil : state.selectedWorkHours)
                 : state.selectedWorkHours
@@ -153,19 +153,34 @@ struct CalendarFeature {
                 return .none
                 
             case .inner(.dayUpdateResponse(.success(let month))):
-                state.isLoading = false
                 state.months[state.calendarIndex] = month
                 return .none
                 
             case .inner(.dayUpdateResponse(.failure(let error))):
-                state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none
                 
             case .inner(.salaryCalculateResponse(.success(let pay))):
                 state.isLoading = false
                 state.totalPay = pay
-                return .none
+                
+                guard var selectedMonth = state.selectedMonth,
+                      let rateDouble = Double(state.rate)
+                else {
+                    state.errorMessage = "월 정보 저장 실패"
+                    return .none
+                }
+                
+                selectedMonth.savedPay = pay
+                selectedMonth.savedRate = rateDouble
+                state.months[state.calendarIndex] = selectedMonth
+                
+                return .run { [selectedMonth] send in
+                    await send(.inner(._monthSaveResponse(Result {
+                        try await calendarDataClient.saveMonth(selectedMonth)
+                    })))
+                }
+                .cancellable(id: CancelID.monthSave)
                 
             case .inner(.salaryCalculateResponse(.failure(let error))):
                 state.isLoading = false
@@ -177,11 +192,16 @@ struct CalendarFeature {
                 state.selectedMonthTitle = title
                 return .none
                 
+            case .inner(._monthSaveResponse(.success)):
+                return .none
+                
+            case .inner(._monthSaveResponse(.failure)):
+                state.errorMessage = "급여 정보 저장 실패"
+                return .none
+                
             case .binding(\.calendarIndex):
                 guard state.calendarIndex != 1 else { return .none }
                 let direction: CalendarPagingDirection = state.calendarIndex == 0 ? .previous : .next
-                state.isLoading = true
-                state.errorMessage = nil
                 
                 return .run { [months = state.months] send in
                     await send(.inner(.calendarPageResponse(Result {
@@ -213,6 +233,10 @@ extension CalendarFeature {
             state.errorMessage = "달력 로드 실패"
             return .none
         }
+        
+        state.totalPay = selectedMonth.savedPay ?? .zero
+        
+        if let savedRate = selectedMonth.savedRate { state.rate = String(savedRate) }
         
         return .run { send in
             let title = await dateClient.toString(selectedMonth.startDate, .yyyyMMKorean)

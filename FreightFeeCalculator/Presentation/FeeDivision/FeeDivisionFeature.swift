@@ -11,7 +11,7 @@ import ComposableArchitecture
 // MARK: - Nested Types
 extension FeeDivisionFeature {
     enum KeyboardFocus {
-        case total, count
+        case total
     }
     
     struct FormattedFee: Identifiable, Equatable {
@@ -36,12 +36,15 @@ struct FeeDivisionFeature {
     struct State: Equatable {
         var errorMessage: String?
         var total: String = ""
-        var count: String = ""
         var mode: DividingMode = .byThousand
+        var shippingType: ShippingType = .parcel
+        var packageGroups: IdentifiedArrayOf<PackageGroup> = []
+        var isPackageGroupExpanded: Bool = true
         var calculationResult: [FeeCombination] = []
         var keyboardFocus: KeyboardFocus?
         
-        var isCalculateButtonDisabled: Bool { UInt(total) == nil || Int(count) == nil }
+        var totalCount: Int { packageGroups.reduce(0) { $0 + $1.count } }
+        var isCalculateButtonDisabled: Bool { UInt(total) == nil || totalCount <= .zero || packageGroups.contains { $0.count <= .zero } }
         var formattedCombinations: [IdentifiableCombination] {
             calculationResult.map { combination in
                 let sortedFees = combination.fees.sorted {
@@ -60,6 +63,8 @@ struct FeeDivisionFeature {
         enum ViewAction {
             case calculateButtonTapped
             case dismissKeyboard
+            case addPackageGroupButtonTapped
+            case removePackageGroup(id: PackageGroup.ID)
         }
         
         enum InnerAction {
@@ -72,49 +77,79 @@ struct FeeDivisionFeature {
     }
     
     @Dependency(\.feeCalculationClient) var feeCalculationClient
+    @Dependency(\.uuid) var uuid
     
     var body: some Reducer<State, Action> {
         BindingReducer()
-        
         Reduce { state, action in
             switch action {
-            case .view(.calculateButtonTapped):
-                state.calculationResult = []
-                state.errorMessage = nil
+            case let .view(viewAction):
+                return handleViewAction(&state, viewAction)
                 
+            case let .inner(innerAction):
+                return handleInnerAction(&state, innerAction)
                 
-                guard let total = UInt(state.total), let count = Int(state.count), total > .zero, count > .zero else {
-                    state.errorMessage = "잘못된 값 입력"
-                    return .none
-                }
-                
-                let mode = state.mode
-                return .run { send in
-                    await send(.inner(.calculationResponse(Result {
-                        try await feeCalculationClient.calculateFee(total, count, mode)
-                    })))
-                }
-                .cancellable(id: CancelID.calculate)
-                
-            case .view(.dismissKeyboard):
-                state.keyboardFocus = nil
-                return .none
-                
-            case .inner(.calculationResponse(.success(let combinations))):
-                state.calculationResult = combinations
-                state.errorMessage = nil
-                return .none
-                
-            case .inner(.calculationResponse(.failure(let error))):
-                state.errorMessage = error.localizedDescription
-                return .none
-                
-            case .binding(\.total), .binding(\.count):
+            case .binding(\.total), .binding(\.packageGroups), .binding(\.mode), .binding(\.shippingType):
                 return .cancel(id: CancelID.calculate)
+                
+            case .binding(\.isPackageGroupExpanded):
+                return .none
                 
             case .binding:
                 return .none
             }
+        }
+    }
+    
+    private func handleViewAction(_ state: inout State, _ viewAction: Action.ViewAction) -> Effect<Action> {
+        switch viewAction {
+        case .calculateButtonTapped:
+            state.calculationResult = []
+            state.errorMessage = nil
+            
+            guard let total: UInt = UInt(state.total), state.totalCount > .zero else {
+                state.errorMessage = "잘못된 값 입력"
+                return .none
+            }
+            
+            let mode: DividingMode = state.mode
+            let shippingType = state.shippingType
+            let packageGroups = state.packageGroups.elements
+            let totalCount = state.totalCount
+            return .run { send in
+                await send(.inner(.calculationResponse(Result {
+                    try await feeCalculationClient.calculateFee(total, totalCount, packageGroups, shippingType, mode)
+                })))
+            }
+            .cancellable(id: CancelID.calculate)
+            
+        case .dismissKeyboard:
+            state.keyboardFocus = nil
+            return .none
+            
+        case .addPackageGroupButtonTapped:
+            let newGroup = PackageGroup(id: uuid())
+            state.packageGroups.append(newGroup)
+            state.isPackageGroupExpanded = true
+            return .none
+            
+        case .removePackageGroup(let id):
+            state.packageGroups.remove(id: id)
+            return .none
+        }
+    }
+    
+    private func handleInnerAction(_ state: inout State, _ innerAction: Action.InnerAction) -> Effect<Action> {
+        switch innerAction {
+        case .calculationResponse(.success(let combinations)):
+            state.calculationResult = combinations
+            state.errorMessage = nil
+            state.isPackageGroupExpanded = false
+            return .none
+            
+        case .calculationResponse(.failure(let error)):
+            state.errorMessage = error.localizedDescription
+            return .none
         }
     }
 }

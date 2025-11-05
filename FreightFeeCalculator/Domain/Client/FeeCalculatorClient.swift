@@ -13,24 +13,50 @@ private final actor LiveCacheStorage {
     
     private var cache: [Key: [FeeCombination]] = [:]
     
-    private func makeKey(totalPrice: UInt, boxesCount: Int, mode: DividingMode) -> Key {
-        "\(totalPrice)-\(boxesCount)-\(mode)"
+    private func makeKey(
+        _ totalPrice: UInt,
+        _ totalCount: Int,
+        _ packageGroups: [PackageGroup],
+        _ shippingType: ShippingType,
+        _ mode: DividingMode
+    ) -> Key {
+        let groupsKey = packageGroups.map { "\($0.type.rawValue):\($0.count)" }.joined(separator: "-")
+        return "\(totalPrice)-\(totalCount)-\(groupsKey)-\(shippingType)-\(mode)"
     }
     
-    func create(totalPrice: UInt, boxesCount: Int, mode: DividingMode, _ combinations: [FeeCombination]) {
-        let key = makeKey(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode)
+    func create(
+        _ totalPrice: UInt,
+        _ totalCount: Int,
+        _ packageGroups: [PackageGroup],
+        _ shippingType: ShippingType,
+        _ mode: DividingMode,
+        _ combinations: [FeeCombination]
+    ) {
+        let key = makeKey(totalPrice, totalCount, packageGroups, shippingType, mode)
         cache[key] = combinations
         print("계산결과 캐시 저장: \(key)")
     }
     
-    func read(totalPrice: UInt, boxesCount: Int, mode: DividingMode) -> [FeeCombination]? {
-        let key = makeKey(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode)
+    func read(
+        _ totalPrice: UInt,
+        _ totalCount: Int,
+        _ packageGroups: [PackageGroup],
+        _ shippingType: ShippingType,
+        _ mode: DividingMode
+    ) -> [FeeCombination]? {
+        let key = makeKey(totalPrice, totalCount, packageGroups, shippingType, mode)
         print("계산결과 캐시 조회: \(key)")
         return cache[key]
     }
     
-    func delete(totalPrice: UInt, boxesCount: Int, mode: DividingMode) {
-        let key = makeKey(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode)
+    func delete(
+        _ totalPrice: UInt,
+        _ totalCount: Int,
+        _ packageGroups: [PackageGroup],
+        _ shippingType: ShippingType,
+        _ mode: DividingMode
+    ) {
+        let key = makeKey(totalPrice, totalCount, packageGroups, shippingType, mode)
         cache.removeValue(forKey: key)
         print("계산결과 캐시 삭제: \(key)")
     }
@@ -38,26 +64,45 @@ private final actor LiveCacheStorage {
 
 /// 화물 포장 조합 계산을 위한 클라이언트
 struct FeeCalculatorClient {
-    var calculateFee: @Sendable (UInt, Int, DividingMode) async throws -> [FeeCombination]
+    var calculateFee: @Sendable (UInt, Int, [PackageGroup], ShippingType, DividingMode) async throws -> [FeeCombination]
 }
 
 // MARK: - DependencyKey
 extension FeeCalculatorClient: DependencyKey {
-    private static func calculate(totalPrice: UInt, boxesCount: Int, mode: DividingMode) throws -> [FeeCombination] {
-        guard boxesCount > .zero, totalPrice > .zero else { throw FeeCalculatorError.invalidInput }
+    private static func calculate(
+        totalPrice: UInt,
+        totalCount: Int,
+        packageGroups: [PackageGroup],
+        shippingType: ShippingType,
+        mode: DividingMode
+    ) throws -> [FeeCombination] {
+        guard totalCount > .zero, totalPrice > .zero else { throw FeeCalculatorError.invalidInput }
         let divisionUnit = mode.value
         
         guard totalPrice % divisionUnit == .zero else { throw FeeCalculatorError.roundingError }
         let targetSum = totalPrice / divisionUnit
-        let count = boxesCount
+        let baseFee = ShippingPolicy.baseFee(for: shippingType)
+        let absoluteMinFee: UInt = 3000
         
-        guard targetSum >= UInt(count) else { throw FeeCalculatorError.invalidInput }
+        guard absoluteMinFee >= divisionUnit, absoluteMinFee % divisionUnit == .zero else { throw FeeCalculatorError.minFeeError }
+        let startValue = absoluteMinFee / divisionUnit
+        
+        guard targetSum >= (UInt(totalCount) * startValue) else { throw FeeCalculatorError.invalidInput }
         var allPartitions: [[UInt]] = []
-        findPartitions(remainingSum: targetSum, remainingCount: count, startValue: 1, currentPartition: [], results: &allPartitions)
-        return allPartitions.map { partition in
+        findPartitions(remainingSum: targetSum, remainingCount: totalCount, startValue: startValue, currentPartition: [], results: &allPartitions)
+        let combinations = allPartitions.map { partition in
             let fees = partition.map { $0 * divisionUnit }
             return FeeCombination(fees: fees)
         }
+        let groupCounts = packageGroups.map { $0.count }.sorted(by: >)
+        let sortedCombinations = combinations.sorted {
+            let scoreA = calculateMatchScore(combination: $0, groupCounts: groupCounts, baseFee: baseFee)
+            let scoreB = calculateMatchScore(combination: $1, groupCounts: groupCounts, baseFee: baseFee)
+            guard scoreA == scoreB else { return scoreA > scoreB }
+            return $0.fees.keys.count < $1.fees.keys.count
+        }
+        
+        return sortedCombinations
     }
     
     /// 정수 분할을 찾는 재귀 함수
@@ -83,14 +128,23 @@ extension FeeCalculatorClient: DependencyKey {
         }
     }
     
+    private static func calculateMatchScore(combination: FeeCombination, groupCounts: [Int], baseFee: UInt) -> Int {
+        var score: Int = .zero
+        let combinationCounts = combination.fees.values.sorted(by: >)
+        if combinationCounts == groupCounts { score += 100 }
+        let allComplyToBaseFee = combination.fees.keys.allSatisfy { $0 >= baseFee }
+        if allComplyToBaseFee { score += 10 }
+        return score
+    }
+    
     private static let cache = LiveCacheStorage()
     
-    static var liveValue: FeeCalculatorClient = .init { totalPrice, boxesCount, mode in
-        if let cached = await cache.read(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode) { return cached }
+    static var liveValue: FeeCalculatorClient = .init { totalPrice, totalCount, packageGroups, shippingType, mode in
+        if let cached = await cache.read(totalPrice, totalCount, packageGroups, shippingType, mode) { return cached }
         
         do {
-            let combinations = try Self.calculate(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode)
-            await cache.create(totalPrice: totalPrice, boxesCount: boxesCount, mode: mode, combinations)
+            let combinations = try Self.calculate(totalPrice: totalPrice, totalCount: totalCount, packageGroups: packageGroups, shippingType: shippingType, mode: mode)
+            await cache.create(totalPrice, totalCount, packageGroups, shippingType, mode, combinations)
             return combinations
         } catch let error as FeeCalculatorError {
             throw error

@@ -16,6 +16,10 @@ enum FeeCalculatorError: Error {
     case roundingError
     /// 오버플로우 발생
     case overflowError
+    /// 기본운임과 맞지 않음
+    case baseFeeError
+    /// 최소운임과 맞지 않음
+    case minFeeError
     case unknown
 }
 

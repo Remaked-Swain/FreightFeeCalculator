@@ -35,7 +35,7 @@ struct CalendarFeature {
         var errorMessage: String?
         var selectedMonthTitle: String = "로딩 중..."
         var calendarIndex: Int = 1
-        var rate: String = "11000"
+        var rate: String = "11500"
         var selectedWorkHours: WorkHours = .three
         var keyboardFocus: KeyboardFocus?
         
